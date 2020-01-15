@@ -24,6 +24,13 @@
 		const blockNum = 22;
 		const blockWidth = width / blockNum;
 		const blockHeight = height / blockNum;
+		const directions = {
+			37: 'left',
+			38: 'up',
+			39: 'right',
+			40: 'down'
+		}
+		let myScore = 0;
 
 		function drawBorder() {
 			ctx.fillStyle = '#ccc';
@@ -51,6 +58,7 @@
 			let centerY = this.row * blockHeight + blockHeight / 2;
 
 			ctx.fillStyle = color;
+			ctx.beginPath();
 			ctx.arc(centerX, centerY, blockWidth / 2, 0, Math.PI * 2, false);
 			ctx.fill();
 		}
@@ -95,7 +103,13 @@
 			}
 
 			this.segments.unshift(newHead);
-			this.segments.pop();
+
+			if (newHead.equal(apple.position)) {
+				myScore++;
+				apple.move();
+			} else {
+				this.segments.pop();
+			}
 		}
 
 		Snake.prototype.checkCollisition = function(head) {
@@ -129,28 +143,36 @@
 			this.nextDirection = newDirection;
 		}
 
-		let directions = {
-			37: 'left',
-			38: 'up',
-			39: 'right',
-			40: 'down'
+		let Apple = function() {
+			this.position = new Block(10, 10);
 		}
 
-		window.addEventListener('keydown', function(event) {
-			let newDirection = directions[event.keyCode];
-			if (newDirection !== undefined) snake.setDirection(newDirection);
-		});
+		Apple.prototype.draw = function() {
+			this.position.drawCircle('red');
+		}
+
+		Apple.prototype.move = function() {
+			let randomCol = Math.floor(Math.random() * (blockNum - 2) + 1);
+			let randomRow = Math.floor(Math.random() * (blockNum - 2) + 1);
+			this.position = new Block(randomCol, randomRow);
+		}
 
 
-		
 		let snake = new Snake();
+		let apple = new Apple();
 
 		let intervalId = setInterval(function() {
 			ctx.clearRect(0, 0, width, height);
 			snake.move();
 			snake.draw();
+			apple.draw();
 			drawBorder();
 		}, 500);
+
+		window.addEventListener('keydown', function(event) {
+			let newDirection = directions[event.keyCode];
+			if (newDirection !== undefined) snake.setDirection(newDirection);
+		});
 
 		button.addEventListener('click', function () {
 			
