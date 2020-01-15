@@ -99,6 +99,7 @@
 			}
 
 			if (this.checkCollisition(newHead)) {
+				clearInterval(intervalId);
 				return;
 			}
 
@@ -154,7 +155,15 @@
 		Apple.prototype.move = function() {
 			let randomCol = Math.floor(Math.random() * (blockNum - 2) + 1);
 			let randomRow = Math.floor(Math.random() * (blockNum - 2) + 1);
+
 			this.position = new Block(randomCol, randomRow);
+
+			for (let i = 0; i < snake.segments.length; i++) {
+				if (this.position.equal(snake.segments[i])) {
+					this.move();
+					break;
+				}
+			}
 		}
 
 
@@ -167,7 +176,7 @@
 			snake.draw();
 			apple.draw();
 			drawBorder();
-		}, 500);
+		}, 300);
 
 		window.addEventListener('keydown', function(event) {
 			let newDirection = directions[event.keyCode];
