@@ -10,18 +10,16 @@
 <body>
 	<div class="game">
 		<canvas id="canvas" width="700" height="700"></canvas>
-		<div id="score"></div>
 		<button id="test-button">Click!</button>
 	</div>
 
 	<script>
 		const canvas = document.getElementById('canvas');
-		const score = document.getElementById('score');
 		const button = document.getElementById('test-button');
 		const ctx = canvas.getContext('2d');
 		const width = canvas.width;
 		const height = canvas.height;
-		const blockNum = 22;
+		const blockNum = 20;
 		const blockWidth = width / blockNum;
 		const blockHeight = height / blockNum;
 		const directions = {
@@ -30,14 +28,38 @@
 			39: 'right',
 			40: 'down'
 		}
-		let myScore = 0;
+		let score = 0;
+		let nextRecord = 10;
+		let speed = 300;
+		let stop = false;
 
-		function drawBorder() {
-			ctx.fillStyle = '#ccc';
+
+		function drawField() {
+			ctx.fillStyle = '#eee600';
+			ctx.fillRect(0, 0, width, height)
+
+			ctx.fillStyle = '#000';
 			ctx.fillRect(0, 0, width, blockHeight); // up
 			ctx.fillRect(width - blockWidth, 0, blockWidth, height); // right
-			ctx.fillRect(0, height - blockHeight, width, blockHeight); // down
 			ctx.fillRect(0, 0, blockWidth, height); // left
+			ctx.fillRect(0, height - blockHeight, width, blockHeight); // down
+		}
+
+		function drawScore() {
+			ctx.font = '30px Fantasy';
+			ctx.strokeStyle = '#000';
+			ctx.lineWidth = 2;
+			ctx.strokeText('Score: ' + score, blockWidth * 1.25, blockHeight * 2);
+			ctx.fillStyle = 'red';
+			ctx.fillText('Score: ' + score, blockWidth * 1.25, blockHeight * 2);
+		}
+
+		function setSpeed() {
+			if (score === nextRecord && speed > 100) {
+				speed -= 50;
+				nextRecord += 10;
+			}
+			return speed;
 		}
 
 		let Block = function(col, row) {
@@ -45,22 +67,48 @@
 			this.row = row;
 		}
 
-		Block.prototype.drawSquare = function(color) {
+		Block.prototype.drawSquare = function(color, border) {
 			let x = this.col * blockWidth;
 			let y = this.row * blockHeight;
+			let lineWidth = 0;
+			let sizeError = 0;
+
+			if (!!border) {
+				lineWidth = blockWidth / 3.5;
+				sizeError = lineWidth / 2;
+				ctx.strokeStyle = border;
+			}
 			
 			ctx.fillStyle = color;
-			ctx.fillRect(x, y, blockWidth, blockHeight);
+			ctx.lineWidth = lineWidth;
+			ctx.fillRect(x + sizeError , y + sizeError, blockWidth - lineWidth, blockHeight - lineWidth);
+
+			if (!!border) {
+				ctx.strokeRect(x + sizeError, y + sizeError, blockWidth - lineWidth, blockHeight - lineWidth);
+			}
 		}
 
-		Block.prototype.drawCircle = function(color) {
+		Block.prototype.drawCircle = function(color, border) {
 			let centerX = this.col * blockWidth + blockWidth / 2;
 			let centerY = this.row * blockHeight + blockHeight / 2;
+			let lineWidth = 0;
+			let sizeError = 0;
+
+			if (!!border) {
+				lineWidth = blockWidth / 6;
+				sizeError = lineWidth / 2;
+				ctx.strokeStyle = border;
+			}
 
 			ctx.fillStyle = color;
+			ctx.lineWidth = lineWidth;
 			ctx.beginPath();
-			ctx.arc(centerX, centerY, blockWidth / 2, 0, Math.PI * 2, false);
+			ctx.arc(centerX, centerY, blockWidth / 2 - sizeError, 0, Math.PI * 2, false);
 			ctx.fill();
+
+			if (!!border) {
+				ctx.stroke();
+			}
 		}
 
 		Block.prototype.equal = function(otherBlock) {
@@ -79,7 +127,7 @@
 
 		Snake.prototype.draw = function() {
 			for (let i = 0; i < this.segments.length; i++) {
-				this.segments[i].drawSquare('blue');
+				this.segments[i].drawSquare('#17a017', '#1f461f');
 			}
 		}
 
@@ -99,14 +147,14 @@
 			}
 
 			if (this.checkCollisition(newHead)) {
-				clearInterval(intervalId);
+				stop = true;
 				return;
 			}
 
 			this.segments.unshift(newHead);
 
 			if (newHead.equal(apple.position)) {
-				myScore++;
+				score++;
 				apple.move();
 			} else {
 				this.segments.pop();
@@ -145,11 +193,11 @@
 		}
 
 		let Apple = function() {
-			this.position = new Block(10, 10);
+			this.position = new Block(5, 5);
 		}
 
 		Apple.prototype.draw = function() {
-			this.position.drawCircle('red');
+			this.position.drawCircle('red', '#bd0000');
 		}
 
 		Apple.prototype.move = function() {
@@ -170,13 +218,17 @@
 		let snake = new Snake();
 		let apple = new Apple();
 
-		let intervalId = setInterval(function() {
+		let timerId = setTimeout(function animation() {
 			ctx.clearRect(0, 0, width, height);
+			drawField();
 			snake.move();
 			snake.draw();
 			apple.draw();
-			drawBorder();
-		}, 300);
+			drawScore();
+			if (!stop) {
+				timerId = setTimeout(animation, setSpeed());
+			}
+		}, speed);
 
 		window.addEventListener('keydown', function(event) {
 			let newDirection = directions[event.keyCode];
