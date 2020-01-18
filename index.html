@@ -4,22 +4,33 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
+	<link rel="stylesheet" href="css/styles.css">
 	<title>Snake 2</title>
 </head>
 
 <body>
-	<div class="game">
+	<div class="snake">
 		<canvas id="canvas" width="700" height="700"></canvas>
-		<button id="test-button">Click!</button>
+
+		<div id="game-over">
+			<p class="game-over__text">Game Over</p>
+			<p class="game-over__score">Your Score: <span id="score">0</span></p>
+			<button class="game-over__new-game">New Game</button>
+		</div>
 	</div>
+	<button id="test-button">Click!</button>
 
 	<script>
 		const canvas = document.getElementById('canvas');
 		const button = document.getElementById('test-button');
+		const gameOver = document.getElementById('game-over');
+		const score = document.getElementById('score');
 		const ctx = canvas.getContext('2d');
 		const width = canvas.width;
 		const height = canvas.height;
-		const blockNum = 20;
+		const centerX = width / 2;
+		const centerY = height / 2;
+		const blockNum = 15;
 		const blockWidth = width / blockNum;
 		const blockHeight = height / blockNum;
 		const directions = {
@@ -28,10 +39,11 @@
 			39: 'right',
 			40: 'down'
 		}
-		let score = 0;
+		let myScore = 0;
 		let nextRecord = 10;
 		let speed = 300;
 		let stop = false;
+		let spawn = true;
 
 
 		function drawField() {
@@ -46,20 +58,45 @@
 		}
 
 		function drawScore() {
-			ctx.font = '30px Fantasy';
+			let fontSize = width / 20;
+			ctx.font = `${fontSize}px Fantasy`;
+			ctx.lineWidth = fontSize / 20;
+			ctx.textBaseline = 'top';
+			ctx.fillStyle = '#f00';
 			ctx.strokeStyle = '#000';
-			ctx.lineWidth = 2;
-			ctx.strokeText('Score: ' + score, blockWidth * 1.25, blockHeight * 2);
-			ctx.fillStyle = 'red';
-			ctx.fillText('Score: ' + score, blockWidth * 1.25, blockHeight * 2);
+
+			ctx.fillText('Score: ' + myScore, blockWidth * 1.25, blockHeight * 1.25);
+			ctx.strokeText('Score: ' + myScore, blockWidth * 1.25, blockHeight * 1.25);
+		}
+
+		function callGameOver(){
+			gameOver.style.display = 'flex';
+			score.textContent = myScore;
 		}
 
 		function setSpeed() {
-			if (score === nextRecord && speed > 100) {
+			if (myScore === nextRecord && speed > 100) {
 				speed -= 50;
 				nextRecord += 10;
 			}
 			return speed;
+		}
+
+		function getRandomNum(min, max, num) {
+			if (num <= 1 || num === undefined) {
+				return Math.floor(Math.random() * (max - min + 1) + min);
+			}
+
+			let arr = [];
+
+			for (let i = 0; i < num; i++) {
+				arr[i] = Math.floor(Math.random() * (max - min + 1) + min);
+			}
+			return arr;
+		}
+
+		function getRandomDirection() {
+			return directions[getRandomNum(37, 40)];
 		}
 
 		let Block = function(col, row) {
@@ -126,7 +163,9 @@
 		}
 
 		Snake.prototype.draw = function() {
-			for (let i = 0; i < this.segments.length; i++) {
+			this.segments[0].drawSquare('#1f461f', '#17a017');
+
+			for (let i = 1; i < this.segments.length; i++) {
 				this.segments[i].drawSquare('#17a017', '#1f461f');
 			}
 		}
@@ -148,13 +187,14 @@
 
 			if (this.checkCollisition(newHead)) {
 				stop = true;
+				// gameOver();
 				return;
 			}
 
 			this.segments.unshift(newHead);
 
 			if (newHead.equal(apple.position)) {
-				score++;
+				myScore++;
 				apple.move();
 			} else {
 				this.segments.pop();
@@ -192,17 +232,52 @@
 			this.nextDirection = newDirection;
 		}
 
+		Snake.prototype.spawn = function() {
+			let head;
+			let segments = [];
+
+			this.direction = getRandomDirection();
+			this.nextDirection = this.direction;
+
+			if (this.direction === 'up') {
+				head = new Block(getRandomNum(1, blockNum - 2), getRandomNum(4, blockNum - 6));
+				segments[0] = head;
+				segments[1] = new Block(head.col, head.row + 1);
+				segments[2] = new Block(head.col, head.row + 2);
+
+			} else if (this.direction === 'right') {
+				head = new Block(getRandomNum(4, blockNum - 6), getRandomNum(1, blockNum - 2));
+				segments[0] = head;
+				segments[1] = new Block(head.col - 1, head.row);
+				segments[2] = new Block(head.col - 2, head.row);
+
+			} else if (this.direction === 'down') {
+				head = new Block(getRandomNum(1, blockNum - 2), getRandomNum(4, blockNum - 6));
+				segments[0] = head;
+				segments[1] = new Block(head.col, head.row - 1);
+				segments[2] = new Block(head.col, head.row - 2);
+
+			} else if (this.direction === 'left') {
+				head = new Block(getRandomNum(4, blockNum - 6), getRandomNum(1, blockNum - 2));
+				segments[0] = head;
+				segments[1] = new Block(head.col + 1, head.row);
+				segments[2] = new Block(head.col + 2, head.row);
+			}
+
+			this.segments = segments;
+		}
+
 		let Apple = function() {
 			this.position = new Block(5, 5);
 		}
 
 		Apple.prototype.draw = function() {
-			this.position.drawCircle('red', '#bd0000');
+			this.position.drawCircle('#f00', '#bd0000');
 		}
 
 		Apple.prototype.move = function() {
-			let randomCol = Math.floor(Math.random() * (blockNum - 2) + 1);
-			let randomRow = Math.floor(Math.random() * (blockNum - 2) + 1);
+			let randomCol = getRandomNum(1, blockNum - 2);
+			let randomRow = getRandomNum(1, blockNum - 2);
 
 			this.position = new Block(randomCol, randomRow);
 
@@ -221,12 +296,19 @@
 		let timerId = setTimeout(function animation() {
 			ctx.clearRect(0, 0, width, height);
 			drawField();
+			if (!!spawn) {
+				snake.spawn();
+				apple.move();
+				spawn = false;
+			}
 			snake.move();
 			snake.draw();
 			apple.draw();
 			drawScore();
 			if (!stop) {
 				timerId = setTimeout(animation, setSpeed());
+			} else {
+				callGameOver();
 			}
 		}, speed);
 
