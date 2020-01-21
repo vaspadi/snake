@@ -12,18 +12,24 @@
 	<div class="snake">
 		<canvas id="canvas" width="700" height="700"></canvas>
 
-		<div id="game-over">
+		<div class="menu" id="game-over">
 			<p class="game-over__text">Game Over</p>
 			<p class="game-over__score">Your Score: <span id="score">0</span></p>
-			<button class="game-over__new-game">New Game</button>
+			<button class="new-game">New Game</button>
+		</div>
+
+		<div class="menu" id="start-menu">
+			<h1 class="start-menu__text">Snake</h1>
+			<button class="new-game">New Game</button>
 		</div>
 	</div>
-	<button id="test-button">Click!</button>
 
 	<script>
 		const canvas = document.getElementById('canvas');
 		const button = document.getElementById('test-button');
 		const gameOver = document.getElementById('game-over');
+		const startMenu = document.getElementById('start-menu');
+		const newGame = document.getElementsByClassName('new-game');
 		const score = document.getElementById('score');
 		const ctx = canvas.getContext('2d');
 		const width = canvas.width;
@@ -39,11 +45,12 @@
 			39: 'right',
 			40: 'down'
 		}
-		let myScore = 0;
-		let nextRecord = 10;
-		let speed = 300;
-		let stop = false;
-		let spawn = true;
+		let myScore;
+		let nextRecord;
+		let speed;
+		let stop;
+		let spawn;
+
 
 
 		function drawField() {
@@ -293,32 +300,45 @@
 		let snake = new Snake();
 		let apple = new Apple();
 
-		let timerId = setTimeout(function animation() {
-			ctx.clearRect(0, 0, width, height);
-			drawField();
-			if (!!spawn) {
-				snake.spawn();
-				apple.move();
-				spawn = false;
-			}
-			snake.move();
-			snake.draw();
-			apple.draw();
-			drawScore();
-			if (!stop) {
-				timerId = setTimeout(animation, setSpeed());
-			} else {
-				callGameOver();
-			}
-		}, speed);
+		drawField();
+		startMenu.style.display = 'flex';
+
+		
+		for (let i = 0; i < newGame.length; i++) {
+			newGame[i].addEventListener('click', function() {
+				startMenu.style.display = 'none';
+				gameOver.style.display = 'none';
+
+				myScore = 0;
+				nextRecord = 10;
+				speed = 300;
+				stop = false;
+				spawn = true;
+
+				let timerId = setTimeout(function animation() {
+					ctx.clearRect(0, 0, width, height);
+					drawField();
+					if (!!spawn) {
+						snake.spawn();
+						apple.move();
+						spawn = false;
+					}
+					snake.move();
+					snake.draw();
+					apple.draw();
+					drawScore();
+					if (!stop) {
+						timerId = setTimeout(animation, setSpeed());
+					} else {
+						callGameOver();
+					}
+				}, speed);
+			});
+		}
 
 		window.addEventListener('keydown', function(event) {
 			let newDirection = directions[event.keyCode];
 			if (newDirection !== undefined) snake.setDirection(newDirection);
-		});
-
-		button.addEventListener('click', function () {
-			
 		});
 	</script>
 </body>

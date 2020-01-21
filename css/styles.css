@@ -10,6 +10,11 @@ html {
 }
 
 body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100vw;
+	height: 100vh;
 	font-family: Fantasy;
 }
 
@@ -20,7 +25,7 @@ body {
 	height: 700px;
 }
 
-#game-over {
+.menu {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -30,6 +35,18 @@ body {
 	flex-direction: column;
 	width: 100%;
 	height: 100%;
+	background-color: #ff000082;
+}
+
+.start-menu__text {
+	font-size: 10rem;
+	line-height: 10rem;
+	color: #bd0000;
+	margin-bottom: 4rem;
+	text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;
+}
+
+#game-over {
 	background-color: #ff000082;
 }
 
@@ -48,7 +65,7 @@ body {
 	text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;
 }
 
-.game-over__new-game {
+.new-game {
 	font-family: Fantasy;
 	font-size: 5rem;
 	color: #f00;
@@ -59,10 +76,10 @@ body {
 	outline: none;
 }
 
-.game-over__new-game:focus {
+.new-game:focus {
 	color: #bd0000;
 }
 
-.game-over__new-game:hover {
+.new-game:hover {
 	color: #bd0000;
 }
