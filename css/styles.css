@@ -15,7 +15,7 @@ body {
 	align-items: center;
 	width: 100vw;
 	height: 100vh;
-	font-family: Fantasy;
+	font-family: 'Black Ops One', cursive;
 }
 
 .snake {
@@ -51,22 +51,22 @@ body {
 }
 
 .game-over__text {
-	font-size: 10rem;
-	line-height: 10rem;
+	font-size: 8rem;
+	line-height: 8rem;
 	color: #bd0000;
 	text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;
 }
 
 .game-over__score {
-	font-size: 5rem;
-	line-height: 5rem;
+	font-size: 4rem;
+	line-height: 4rem;
 	color: #f00;
 	margin-bottom: 4rem;
 	text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;
 }
 
 .new-game {
-	font-family: Fantasy;
+	font-family: 'Black Ops One', cursive;
 	font-size: 5rem;
 	color: #f00;
 	padding: 0.1rem 1rem;

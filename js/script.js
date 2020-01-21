@@ -37,7 +37,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 	function drawScore() {
 		let fontSize = width / 20;
-		ctx.font = `${fontSize}px Fantasy`;
+		ctx.font = `${fontSize}px Black Ops One`;
 		ctx.lineWidth = fontSize / 20;
 		ctx.textBaseline = 'top';
 		ctx.fillStyle = '#f00';
