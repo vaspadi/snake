@@ -1,33 +1,32 @@
-window.addEventListener('DOMContentLoaded', function() {
-	const canvas = document.getElementById('canvas');
-	const gameOver = document.getElementById('game-over');
-	const startMenu = document.getElementById('start-menu');
-	const newGame = document.getElementsByClassName('new-game');
-	const score = document.getElementById('score');
-	const ctx = canvas.getContext('2d');
-	const width = canvas.width;
-	const height = canvas.height;
-	const centerX = width / 2;
-	const centerY = height / 2;
-	const blockNum = 15;
-	const blockWidth = width / blockNum;
-	const blockHeight = height / blockNum;
-	const directions = {
+window.addEventListener('DOMContentLoaded', function () {
+	var canvas = document.getElementById('canvas');
+	var gameOver = document.getElementById('game-over');
+	var startMenu = document.getElementById('start-menu');
+	var newGame = document.getElementsByClassName('new-game');
+	var score = document.getElementById('score');
+	var ctx = canvas.getContext('2d');
+	var width = canvas.width;
+	var height = canvas.height;
+	var centerX = width / 2;
+	var centerY = height / 2;
+	var blockNum = 15;
+	var blockWidth = width / blockNum;
+	var blockHeight = height / blockNum;
+	var directions = {
 		37: 'left',
 		38: 'up',
 		39: 'right',
 		40: 'down'
 	};
-	let myScore;
-	let nextRecord;
-	let speed;
-	let stop;
-	let spawn;
+	var myScore;
+	var nextRecord;
+	var speed;
+	var stop;
+	var spawn;
 
 	function drawField() {
 		ctx.fillStyle = '#eee600';
 		ctx.fillRect(0, 0, width, height);
-
 		ctx.fillStyle = '#000';
 		ctx.fillRect(0, 0, width, blockHeight); // up
 		ctx.fillRect(width - blockWidth, 0, blockWidth, height); // right
@@ -36,13 +35,12 @@ window.addEventListener('DOMContentLoaded', function() {
 	}
 
 	function drawScore() {
-		let fontSize = width / 20;
-		ctx.font = `${fontSize}px Black Ops One`;
+		var fontSize = width / 20;
+		ctx.font = "".concat(fontSize, "px Black Ops One");
 		ctx.lineWidth = fontSize / 20;
 		ctx.textBaseline = 'top';
 		ctx.fillStyle = '#f00';
 		ctx.strokeStyle = '#000';
-
 		ctx.fillText('Score: ' + myScore, blockWidth * 1.25, blockHeight * 1.25);
 		ctx.strokeText('Score: ' + myScore, blockWidth * 1.25, blockHeight * 1.25);
 	}
@@ -65,9 +63,9 @@ window.addEventListener('DOMContentLoaded', function() {
 			return Math.floor(Math.random() * (max - min + 1) + min);
 		}
 
-		let arr = [];
+		var arr = [];
 
-		for (let i = 0; i < num; i++) {
+		for (var i = 0; i < num; i++) {
 			arr[i] = Math.floor(Math.random() * (max - min + 1) + min);
 		}
 		return arr;
@@ -77,16 +75,16 @@ window.addEventListener('DOMContentLoaded', function() {
 		return directions[getRandomNum(37, 40)];
 	}
 
-	let Block = function (col, row) {
+	var Block = function Block(col, row) {
 		this.col = col;
 		this.row = row;
 	};
 
 	Block.prototype.drawSquare = function (color, border) {
-		let x = this.col * blockWidth;
-		let y = this.row * blockHeight;
-		let lineWidth = 0;
-		let sizeError = 0;
+		var x = this.col * blockWidth;
+		var y = this.row * blockHeight;
+		var lineWidth = 0;
+		var sizeError = 0;
 
 		if (!!border) {
 			lineWidth = blockWidth / 3.5;
@@ -104,10 +102,10 @@ window.addEventListener('DOMContentLoaded', function() {
 	};
 
 	Block.prototype.drawCircle = function (color, border) {
-		let centerX = this.col * blockWidth + blockWidth / 2;
-		let centerY = this.row * blockHeight + blockHeight / 2;
-		let lineWidth = 0;
-		let sizeError = 0;
+		var centerX = this.col * blockWidth + blockWidth / 2;
+		var centerY = this.row * blockHeight + blockHeight / 2;
+		var lineWidth = 0;
+		var sizeError = 0;
 
 		if (!!border) {
 			lineWidth = blockWidth / 6;
@@ -130,12 +128,8 @@ window.addEventListener('DOMContentLoaded', function() {
 		return this.col === otherBlock.col && this.row === otherBlock.row;
 	};
 
-	let Snake = function () {
-		this.segments = [
-			new Block(3, 1),
-			new Block(2, 1),
-			new Block(1, 1)
-		];
+	var Snake = function Snake() {
+		this.segments = [new Block(3, 1), new Block(2, 1), new Block(1, 1)];
 		this.direction = 'right';
 		this.nextDirection = 'right';
 	};
@@ -143,14 +137,14 @@ window.addEventListener('DOMContentLoaded', function() {
 	Snake.prototype.draw = function () {
 		this.segments[0].drawSquare('#1f461f', '#17a017');
 
-		for (let i = 1; i < this.segments.length; i++) {
+		for (var i = 1; i < this.segments.length; i++) {
 			this.segments[i].drawSquare('#17a017', '#1f461f');
 		}
 	};
 
 	Snake.prototype.move = function () {
-		let head = this.segments[0];
-		let newHead;
+		var head = this.segments[0];
+		var newHead;
 		this.direction = this.nextDirection;
 
 		if (this.direction === 'right') {
@@ -165,7 +159,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
 		if (this.checkCollisition(newHead)) {
 			stop = true;
-			// gameOver();
 			return;
 		}
 
@@ -180,14 +173,14 @@ window.addEventListener('DOMContentLoaded', function() {
 	};
 
 	Snake.prototype.checkCollisition = function (head) {
-		let wallCollisition = false;
-		let selfCollisition = false;
+		var wallCollisition = false;
+		var selfCollisition = false;
 
 		if (head.col === 0 || head.row === 0 || head.col === blockNum - 1 || head.row === blockNum - 1) {
 			wallCollisition = true;
 		}
 
-		for (let i = 0; i < this.segments.length; i++) {
+		for (var i = 0; i < this.segments.length; i++) {
 			if (head.equal(this.segments[i])) {
 				selfCollisition = true;
 			}
@@ -211,9 +204,8 @@ window.addEventListener('DOMContentLoaded', function() {
 	};
 
 	Snake.prototype.spawn = function () {
-		let head;
-		let segments = [];
-
+		var head;
+		var segments = [];
 		this.direction = getRandomDirection();
 		this.nextDirection = this.direction;
 
@@ -222,19 +214,16 @@ window.addEventListener('DOMContentLoaded', function() {
 			segments[0] = head;
 			segments[1] = new Block(head.col, head.row + 1);
 			segments[2] = new Block(head.col, head.row + 2);
-
 		} else if (this.direction === 'right') {
 			head = new Block(getRandomNum(4, blockNum - 6), getRandomNum(1, blockNum - 2));
 			segments[0] = head;
 			segments[1] = new Block(head.col - 1, head.row);
 			segments[2] = new Block(head.col - 2, head.row);
-
 		} else if (this.direction === 'down') {
 			head = new Block(getRandomNum(1, blockNum - 2), getRandomNum(4, blockNum - 6));
 			segments[0] = head;
 			segments[1] = new Block(head.col, head.row - 1);
 			segments[2] = new Block(head.col, head.row - 2);
-
 		} else if (this.direction === 'left') {
 			head = new Block(getRandomNum(4, blockNum - 6), getRandomNum(1, blockNum - 2));
 			segments[0] = head;
@@ -245,7 +234,7 @@ window.addEventListener('DOMContentLoaded', function() {
 		this.segments = segments;
 	};
 
-	let Apple = function () {
+	var Apple = function Apple() {
 		this.position = new Block(5, 5);
 	};
 
@@ -254,12 +243,11 @@ window.addEventListener('DOMContentLoaded', function() {
 	};
 
 	Apple.prototype.move = function () {
-		let randomCol = getRandomNum(1, blockNum - 2);
-		let randomRow = getRandomNum(1, blockNum - 2);
-
+		var randomCol = getRandomNum(1, blockNum - 2);
+		var randomRow = getRandomNum(1, blockNum - 2);
 		this.position = new Block(randomCol, randomRow);
 
-		for (let i = 0; i < snake.segments.length; i++) {
+		for (var i = 0; i < snake.segments.length; i++) {
 			if (this.position.equal(snake.segments[i])) {
 				this.move();
 				break;
@@ -267,37 +255,35 @@ window.addEventListener('DOMContentLoaded', function() {
 		}
 	};
 
-
-	let snake = new Snake();
-	let apple = new Apple();
-
+	var snake = new Snake();
+	var apple = new Apple();
 	drawField();
 	startMenu.style.display = 'flex';
 
-
-	for (let i = 0; i < newGame.length; i++) {
-		newGame[i].addEventListener('click', function() {
+	for (var i = 0; i < newGame.length; i++) {
+		newGame[i].addEventListener('click', function () {
 			startMenu.style.display = 'none';
 			gameOver.style.display = 'none';
-
 			myScore = 0;
 			nextRecord = 10;
 			speed = 300;
 			stop = false;
 			spawn = true;
-
-			let timerId = setTimeout(function animation() {
+			var timerId = setTimeout(function animation() {
 				ctx.clearRect(0, 0, width, height);
 				drawField();
+
 				if (!!spawn) {
 					snake.spawn();
 					apple.move();
 					spawn = false;
 				}
+
 				snake.move();
 				snake.draw();
 				apple.draw();
 				drawScore();
+
 				if (!stop) {
 					timerId = setTimeout(animation, setSpeed());
 				} else {
@@ -308,7 +294,7 @@ window.addEventListener('DOMContentLoaded', function() {
 	}
 
 	window.addEventListener('keydown', function (event) {
-		let newDirection = directions[event.keyCode];
+		var newDirection = directions[event.keyCode];
 		if (newDirection !== undefined) snake.setDirection(newDirection);
 	});
 });
