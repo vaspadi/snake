@@ -1,15 +1,15 @@
 window.addEventListener('DOMContentLoaded', function () {
 	var canvas = document.getElementById('canvas');
-	resizeGame();
 	var gameOver = document.getElementById('game-over');
 	var startMenu = document.getElementById('start-menu');
 	var newGame = document.getElementsByClassName('new-game');
 	var ctx = canvas.getContext('2d');
-	var width = canvas.width;
-	var height = canvas.height;
 	var blockNum = 15;
-	var blockWidth = width / blockNum;
-	var blockHeight = height / blockNum;
+	var width;
+	var height;
+	var blockWidth;
+	var blockHeight;
+	resizeGame();
 	var directions = {
 		37: 'left',
 		38: 'up',
@@ -43,9 +43,15 @@ window.addEventListener('DOMContentLoaded', function () {
 		canvas.width = newWidth;
 		canvas.height = newHeight;
 		html.style.fontSize = (newWidth / 1100) + 'em';
+		width = canvas.width;
+		height = canvas.height;
+		blockWidth = width / blockNum;
+		blockHeight = height / blockNum;
+		clearField();
 	}
 
-	function drawField() {
+	function clearField() {
+		ctx.clearRect(0, 0, width, height);
 		ctx.fillStyle = '#eee600';
 		ctx.fillRect(0, 0, width, height);
 		ctx.fillStyle = '#000';
@@ -280,7 +286,7 @@ window.addEventListener('DOMContentLoaded', function () {
 
 	var snake = new Snake();
 	var apple = new Apple();
-	drawField();
+	clearField();
 	startMenu.style.display = 'flex';
 
 	for (var i = 0; i < newGame.length; i++) {
@@ -293,10 +299,9 @@ window.addEventListener('DOMContentLoaded', function () {
 			stop = false;
 			spawn = true;
 			var timerId = setTimeout(function animation() {
-				ctx.clearRect(0, 0, width, height);
-				drawField();
+				clearField();
 
-				if (!!spawn) {
+				if (spawn) {
 					snake.spawn();
 					apple.move();
 					spawn = false;
@@ -315,6 +320,9 @@ window.addEventListener('DOMContentLoaded', function () {
 			}, speed);
 		});
 	}
+
+	window.addEventListener('resize', resizeGame, false);
+	window.addEventListener('orientationchange', resizeGame, false);
 
 	window.addEventListener('keydown', function (event) {
 		var newDirection = directions[event.keyCode];
