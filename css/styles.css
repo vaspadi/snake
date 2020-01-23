@@ -18,7 +18,7 @@ body {
 	font-family: 'Black Ops One', cursive;
 }
 
-.snake {
+#snake {
 	position: relative;
 	display: inline-block;
 	width: 700px;

@@ -1,14 +1,12 @@
 window.addEventListener('DOMContentLoaded', function () {
 	var canvas = document.getElementById('canvas');
+	resizeGame();
 	var gameOver = document.getElementById('game-over');
 	var startMenu = document.getElementById('start-menu');
 	var newGame = document.getElementsByClassName('new-game');
-	var score = document.getElementById('score');
 	var ctx = canvas.getContext('2d');
 	var width = canvas.width;
 	var height = canvas.height;
-	var centerX = width / 2;
-	var centerY = height / 2;
 	var blockNum = 15;
 	var blockWidth = width / blockNum;
 	var blockHeight = height / blockNum;
@@ -23,6 +21,29 @@ window.addEventListener('DOMContentLoaded', function () {
 	var speed;
 	var stop;
 	var spawn;
+
+	function resizeGame() {
+		var snake = document.getElementById('snake');
+		var html = document.getElementsByTagName('html')[0];
+		var newWidth = window.innerWidth;
+		var newHeight = window.innerHeight;
+		var widthToHeight = snake.clientWidth / snake.clientHeight;
+		var newWidthToHeight = newWidth / newHeight;
+
+		if (widthToHeight < newWidthToHeight) {
+			newWidth = newHeight * widthToHeight;
+			snake.style.height = newHeight + 'px';
+			snake.style.width = newWidth + 'px';
+		} else {
+			newHeight = newWidth / widthToHeight;
+			snake.style.height = newHeight + 'px';
+			snake.style.width = newWidth + 'px';
+		}
+
+		canvas.width = newWidth;
+		canvas.height = newHeight;
+		html.style.fontSize = (newWidth / 1100) + 'em';
+	}
 
 	function drawField() {
 		ctx.fillStyle = '#eee600';
@@ -46,6 +67,8 @@ window.addEventListener('DOMContentLoaded', function () {
 	}
 
 	function callGameOver() {
+		var score = document.getElementById('score');
+
 		gameOver.style.display = 'flex';
 		score.textContent = myScore;
 	}
