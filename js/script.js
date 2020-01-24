@@ -25,8 +25,8 @@ window.addEventListener('DOMContentLoaded', function () {
 	function resizeGame() {
 		var snake = document.getElementById('snake');
 		var html = document.getElementsByTagName('html')[0];
-		var newWidth = window.innerWidth;
-		var newHeight = window.innerHeight;
+		var newWidth = window.innerWidth * 0.99;
+		var newHeight = window.innerHeight * 0.99;
 		var widthToHeight = snake.clientWidth / snake.clientHeight;
 		var newWidthToHeight = newWidth / newHeight;
 
@@ -327,5 +327,9 @@ window.addEventListener('DOMContentLoaded', function () {
 	window.addEventListener('keydown', function (event) {
 		var newDirection = directions[event.keyCode];
 		if (newDirection !== undefined) snake.setDirection(newDirection);
+	});
+
+	Hammer(window).on('swipe', function(event) {
+		snake.setDirection(event.gesture.direction);
 	});
 });
