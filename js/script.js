@@ -24,7 +24,15 @@ window.addEventListener('DOMContentLoaded', function () {
   let blockWidth;
   let blockHeight;
 
-  const clearField = function clearField() {
+  const resetVar = function () {
+    myScore = 0;
+    nextRecord = 10;
+    speed = 300;
+    stop = false;
+    spawn = true;
+  };
+
+  const clearField = function () {
     ctx.clearRect(0, 0, width, height);
 
     ctx.fillStyle = '#eee600';
@@ -37,7 +45,7 @@ window.addEventListener('DOMContentLoaded', function () {
     ctx.fillRect(0, height - blockHeight, width, blockHeight); // down
   };
 
-  const resizeGame = function resizeGame() {
+  const resizeGame = function () {
     const snake = document.getElementById('snake');
     const html = document.getElementsByTagName('html')[0];
     let newWidth = window.innerWidth * 0.99;
@@ -64,7 +72,7 @@ window.addEventListener('DOMContentLoaded', function () {
     clearField();
   };
 
-  const drawScore = function drawScore() {
+  const drawScore = function () {
     const fontSize = width / 20;
 
     ctx.font = "".concat(fontSize, "px Black Ops One");
@@ -77,14 +85,14 @@ window.addEventListener('DOMContentLoaded', function () {
     ctx.strokeText('Score: ' + myScore, blockWidth * 1.25, blockHeight * 1.25);
   };
 
-  const callGameOver = function callGameOver() {
+  const callGameOver = function () {
     const score = document.getElementById('score');
 
     gameOver.style.display = 'flex';
     score.textContent = myScore;
   };
 
-  const setSpeed = function setSpeed() {
+  const setSpeed = function () {
     if (myScore === nextRecord && speed > 100) {
       speed -= 50;
       nextRecord += 10;
@@ -93,7 +101,7 @@ window.addEventListener('DOMContentLoaded', function () {
     return speed;
   };
 
-  const getRandomNum = function getRandomNum(min, max, num) {
+  const getRandomNum = function (min, max, num) {
     if (num <= 1 || num === undefined) {
       return Math.floor( Math.random() * (max - min + 1) + min );
     }
@@ -107,7 +115,7 @@ window.addEventListener('DOMContentLoaded', function () {
     return arr;
   };
 
-  const getRandomDirection = function getRandomDirection() {
+  const getRandomDirection = function () {
     return directions[getRandomNum(37, 40)];
   };
 
@@ -297,7 +305,7 @@ window.addEventListener('DOMContentLoaded', function () {
     this.segments = segments;
   };
 
-  let Apple = function Apple() {
+  const Apple = function Apple() {
     this.position = new Block(5, 5);
   };
 
@@ -319,6 +327,26 @@ window.addEventListener('DOMContentLoaded', function () {
     }
   };
 
+  const animation = function () {
+    clearField();
+
+    if (spawn) {
+      snake.spawn();
+      apple.move();
+      spawn = false;
+    }
+
+    snake.move();
+    snake.draw();
+    apple.draw();
+    drawScore();
+
+    if (stop) {
+      callGameOver();
+    } else {
+      setTimeout(animation, setSpeed());
+    }
+  };
   
 
   let snake = new Snake();
@@ -332,31 +360,10 @@ window.addEventListener('DOMContentLoaded', function () {
     newGame[i].addEventListener('click', function () {
       startMenu.style.display = 'none';
       gameOver.style.display = 'none';
-      myScore = 0;
-      nextRecord = 10;
-      speed = 300;
-      stop = false;
-      spawn = true;
-      let timerId = setTimeout(function animation() {
-        clearField();
 
-        if (spawn) {
-          snake.spawn();
-          apple.move();
-          spawn = false;
-        }
+      resetVar();
 
-        snake.move();
-        snake.draw();
-        apple.draw();
-        drawScore();
-
-        if (!stop) {
-          timerId = setTimeout(animation, setSpeed());
-        } else {
-          callGameOver();
-        }
-      }, speed);
+      setTimeout(animation(), speed);
     });
   }
 
