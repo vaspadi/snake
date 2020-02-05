@@ -12,25 +12,12 @@ window.addEventListener('DOMContentLoaded', function () {
     39: 'right',
     40: 'down'
   };
-  let myScore;
-  let nextRecord;
-  let speed;
-  let stop;
-  let spawn;
   // game sizes
   const blockNum = 15;
   let width;
   let height;
   let blockWidth;
   let blockHeight;
-
-  const resetVar = function () {
-    myScore = 0;
-    nextRecord = 10;
-    speed = 300;
-    stop = false;
-    spawn = true;
-  };
 
   const clearField = function () {
     ctx.clearRect(0, 0, width, height);
@@ -48,8 +35,8 @@ window.addEventListener('DOMContentLoaded', function () {
   const resizeGame = function () {
     const snake = document.getElementById('snake');
     const html = document.getElementsByTagName('html')[0];
-    let newWidth = window.innerWidth * 0.99;
-    let newHeight = window.innerHeight * 0.99;
+    let newWidth = window.innerWidth * 0.98;
+    let newHeight = window.innerHeight * 0.98;
     let widthToHeight = snake.clientWidth / snake.clientHeight;
     let newWidthToHeight = newWidth / newHeight;
 
@@ -81,24 +68,15 @@ window.addEventListener('DOMContentLoaded', function () {
     ctx.fillStyle = '#f00';
     ctx.strokeStyle = '#000';
 
-    ctx.fillText('Score: ' + myScore, blockWidth * 1.25, blockHeight * 1.25);
-    ctx.strokeText('Score: ' + myScore, blockWidth * 1.25, blockHeight * 1.25);
+    ctx.fillText('Score: ' + snake.score, blockWidth * 1.25, blockHeight * 1.25);
+    ctx.strokeText('Score: ' + snake.score, blockWidth * 1.25, blockHeight * 1.25);
   };
 
   const callGameOver = function () {
     const score = document.getElementById('score');
 
     gameOver.style.display = 'flex';
-    score.textContent = myScore;
-  };
-
-  const setSpeed = function () {
-    if (myScore === nextRecord && speed > 100) {
-      speed -= 50;
-      nextRecord += 10;
-    }
-
-    return speed;
+    score.textContent = snake.score;
   };
 
   const getRandomNum = function (min, max, num) {
@@ -183,13 +161,20 @@ window.addEventListener('DOMContentLoaded', function () {
     ];
     this.direction = 'right';
     this.nextDirection = 'right';
+    this.score = 0;
+    this.scorePurpose = 10;
+    this.speed = 300;
+    this.hit = false;
+    this.spawn = false;
+    this.bodyColor = '#17a017';
+    this.secondColor = '#1f461f';
   };
 
   Snake.prototype.draw = function () {
-    this.segments[0].drawSquare('#1f461f', '#17a017');
+    this.segments[0].drawSquare(this.secondColor, this.bodyColor);
 
     for (let i = 1; i < this.segments.length; i++) {
-      this.segments[i].drawSquare('#17a017', '#1f461f');
+      this.segments[i].drawSquare(this.bodyColor, this.secondColor);
     }
   };
   
@@ -237,14 +222,14 @@ window.addEventListener('DOMContentLoaded', function () {
     }
 
     if (this.checkCollisition(newHead)) {
-      stop = true;
+      this.hit = true;
       return;
     }
 
     this.segments.unshift(newHead);
 
     if ( newHead.equal(apple.position) ) {
-      myScore++;
+      this.score++;
       apple.move();
     } else {
       this.segments.pop();
@@ -265,7 +250,7 @@ window.addEventListener('DOMContentLoaded', function () {
     this.nextDirection = newDirection;
   };
 
-  Snake.prototype.spawn = function () {
+  Snake.prototype.generate = function () {
     let head;
     let segments = [];
     this.direction = getRandomDirection();
@@ -305,12 +290,31 @@ window.addEventListener('DOMContentLoaded', function () {
     this.segments = segments;
   };
 
+  Snake.prototype.setNewSpeed = function () {
+    if (this.score === this.scorePurpose && this.speed > 100) {
+      this.speed -= 50;
+      this.scorePurpose += 10;
+    }
+
+    return this.speed;
+  };
+
+  Snake.prototype.resetProperties = function () {
+    this.score = 0;
+    this.scorePurpose = 10;
+    this.speed = 300;
+    this.hit = false;
+    this.spawn = false;
+  };
+
   const Apple = function Apple() {
     this.position = new Block(5, 5);
+    this.bodyColor = '#f00';
+    this.secondColor = '#bd0000';
   };
 
   Apple.prototype.draw = function () {
-    this.position.drawCircle('#f00', '#bd0000');
+    this.position.drawCircle(this.bodyColor, this.secondColor);
   };
 
   Apple.prototype.move = function () {
@@ -330,10 +334,10 @@ window.addEventListener('DOMContentLoaded', function () {
   const animation = function () {
     clearField();
 
-    if (spawn) {
-      snake.spawn();
+    if (!snake.spawn) {
+      snake.generate();
       apple.move();
-      spawn = false;
+      snake.spawn = true;
     }
 
     snake.move();
@@ -341,10 +345,10 @@ window.addEventListener('DOMContentLoaded', function () {
     apple.draw();
     drawScore();
 
-    if (stop) {
+    if (snake.hit) {
       callGameOver();
     } else {
-      setTimeout(animation, setSpeed());
+      setTimeout(animation, snake.setNewSpeed());
     }
   };
   
@@ -361,9 +365,9 @@ window.addEventListener('DOMContentLoaded', function () {
       startMenu.style.display = 'none';
       gameOver.style.display = 'none';
 
-      resetVar();
+      snake.resetProperties();
 
-      setTimeout(animation(), speed);
+      setTimeout(animation(), snake.speed);
     });
   }
 
