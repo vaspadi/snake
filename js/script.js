@@ -351,7 +351,7 @@ window.addEventListener('DOMContentLoaded', function () {
       setTimeout(animation, snake.setNewSpeed());
     }
   };
-  
+
 
   let snake = new Snake();
   let apple = new Apple();
@@ -373,6 +373,45 @@ window.addEventListener('DOMContentLoaded', function () {
 
   window.addEventListener('resize', resizeGame, false);
   window.addEventListener('orientationchange', resizeGame, false);
+
+  let toggleFS = document.getElementsByClassName('toggle-fullscreen')[0];
+
+  toggleFS.addEventListener('click', function () {
+
+    const launchFullScreen = function () {
+      let element = document.documentElement;
+
+      if (element.requestFullscreen) {
+        element.requestFullscreen();
+      } else if (element.webkitrequestFullscreen) {
+        element.webkitRequestFullscreen();
+      } else if (element.mozRequestFullscreen) {
+        element.mozRequestFullscreen();
+      } else if (element.msRequestFullscreen) {
+        element.msRequestFullscreen();
+      }
+    };
+
+    const exitFullScreen = function () {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.mozExitFullscreen) {
+        document.mozExitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    };
+
+    if (document.fullscreenElement) {
+      exitFullScreen();
+      // document.exitFullscreen();
+    } else {
+      launchFullScreen();
+      // document.documentElement.requestFullscreen();
+    }
+  });
 
   window.addEventListener('keydown', function(event) {
     const newDirection = directions[event.keyCode];

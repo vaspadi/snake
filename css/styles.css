@@ -15,7 +15,7 @@ body {
 	justify-content: center;
 	align-items: center;
 	width: 100vw;
-	height: 100vh;
+  height: 100vh;
 	overscroll-behavior: none;
 }
 
@@ -83,4 +83,26 @@ body {
 
 .new-game:hover {
 	color: #bd0000;
+}
+
+.toggle-fullscreen {
+  position: absolute;
+  top: 6rem;
+  right: 6rem;
+  width: 3rem;
+  height: 3rem;
+  color: #f00;
+  background-color: transparent;
+  background-image: url(../img/fullscreen.svg);
+  background-repeat: no-repeat;
+  background-size: 60% 60%;
+  background-position: center;
+  border: 0.2rem solid #000;
+  border-radius: 30%;
+}
+
+.toggle-fullscreen:hover,
+.toggle-fullscreen:focus {
+  background-color: rgba(189, 0, 0, 0.7);
+  outline: none;
 }
